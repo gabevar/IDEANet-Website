@@ -1,0 +1,30 @@
+[
+  {
+    "objectID": "index.html",
+    "href": "index.html",
+    "title": "IDEANet website",
+    "section": "",
+    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "about.html",
+    "href": "about.html",
+    "title": "About",
+    "section": "",
+    "text": "About this site\n\n1 + 1\n\n[1] 2"
+  },
+  {
+    "objectID": "index.html#title-group-1",
+    "href": "index.html#title-group-1",
+    "title": "IDEANet website",
+    "section": "Title group 1",
+    "text": "Title group 1"
+  },
+  {
+    "objectID": "index.html#title-group-2",
+    "href": "index.html#title-group-2",
+    "title": "IDEANet website",
+    "section": "Title Group 2",
+    "text": "Title Group 2"
+  }
+]
