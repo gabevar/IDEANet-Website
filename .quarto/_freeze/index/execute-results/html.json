@@ -1,7 +1,7 @@
 {
-  "hash": "0398947d6c3c88557de14043e81cb67c",
+  "hash": "68936b38cdee2f708599fb4eb951daba",
   "result": {
-    "markdown": "---\ntitle: \"IDEANet website\"\nproject:\n  type: website\n  output-dir: docs\n---\n\n\nThis is a Quarto website.\n\nTo learn more about Quarto websites visit <https://quarto.org/docs/websites>.\n\n\n::: {.cell}\n\n```{.r .cell-code}\n1 + 1\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[1] 2\n```\n:::\n:::\n\n\n## \n",
+    "markdown": "---\ntitle: \"IDEANet website\"\n---\n\n\nThis is a Quarto website.\n\nTo learn more about Quarto websites visit <https://quarto.org/docs/websites>.\n\n\n::: {.cell}\n\n```{.r .cell-code}\n1 + 1\n```\n\n::: {.cell-output .cell-output-stdout}\n```\n[1] 2\n```\n:::\n:::\n\n\n## \n",
     "supporting": [],
     "filters": [
       "rmarkdown/pagebreak.lua"
