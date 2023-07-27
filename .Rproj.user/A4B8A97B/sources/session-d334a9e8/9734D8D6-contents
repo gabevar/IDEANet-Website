@@ -1,0 +1,458 @@
+---
+title: "Introducing IDEANet - Integrating Data Exchange and Analysis for Networks"
+output:
+  distill::distill_article:
+    toc: yes
+    toc_float: yes
+  html_document:
+    toc: yes
+    toc_depth: '4'
+    toc_float: yes
+    df_print: paged
+  pdf_document:
+    toc: no
+editor_options:
+  chunk_output_type: inline
+---
+
+<br/><br/>
+
+The goal of the *IDEANet* program is to lower the barrier of entry to network analysis for scholars interested in relational measurement. Some researchers may have data and questions that are suitable to network analysis. And yet, getting comfortable with the tools available in R can prove to be an arduous and time consuming task.
+
+*IDEANet* is a set of functions which leverages existing network analysis packages in R (igraph, network, sna) to provide high quality measurements seamlessly from the starting data. The team behind IDEANet in collaboration with the Duke University Library Services have also created a repository of publicly available network datasets which researchers can pull from or host their own data. If you are interested in hosting your own data, feel free to fill out [this form](https://docs.google.com/forms/d/1CBL8QnkXqZ1uI5SAv7W9nyLhtztBDs7uHUzEvDrBKzA) and a member of our team will be in contact shortly.
+
+IDEANet is supported by the National Science Foundation as part of the Human Networks and Data Science - Infrastructure program (BCS-2024271 and BCS-2140024).
+
+# Getting setup
+## Connecting to the dataverse archive
+
+We begin by setting up a connection to the Dataverse archive. If you are using your own data, have manually downloaded the data from the Dataverse or are already familiar with the Dataverse API, feel free to skip this step.
+
+Let's start by downloading the latest version of the dataverse API tools and the required packages that we will be using throughout this vignette.
+
+```{r}
+setwd(dirname(rstudioapi::getSourceEditorContext()$path))
+if (!require("pacman", character.only = TRUE)) {install.packages("pacman", dep=TRUE)}
+pacman::p_load(remotes, tidyverse, rmarkdown, igraph)
+if (!require("dataverse", character.only = TRUE)) {remotes::install_github("iqss/dataverse-client-r")}
+knitr::opts_chunk$set(layout = "l-body-outset")
+```
+
+Accessing the Dataverse comes in two steps. First, we need to set up the top level Dataverse we are interested in accessing -- in this case, the Duke Library Dataverse.
+
+```{r, warning = F, message = F}
+Sys.setenv("DATAVERSE_SERVER" = "https://dataverse-test-01.oit.duke.edu")
+```
+
+Second, we pull in the edgelist and nodelist that compose the networks we will be exploring using the IDEANet tools. For more information about searching and downloading files using the Dataverse API, please refer to [this vignette](https://cran.r-project.org/web/packages/dataverse/vignettes/A-introduction.html). Files can also be manually downloaded from [this repository](https://dataverse-test-01.oit.duke.edu/dataset.xhtml?persistentId=doi:10.5072/FK2/LIR98P).
+
+```{r, warning = F, message = F}
+edges <- get_dataframe_by_name(
+  filename = "edges.tab",
+  dataset = "10.5072/FK2/LIR98P", 
+  server = "https://dataverse-test-01.oit.duke.edu") %>% 
+  mutate(from = format(from, scientific = F), to = format(to, scientific = F)) 
+
+nodes <- get_dataframe_by_name(
+  filename = "nodes.tab",
+  dataset = "10.5072/FK2/LIR98P", 
+  server = "https://dataverse-test-01.oit.duke.edu") %>% 
+  mutate(id = format(id, scientific = F))
+```
+
+## Exploring the data
+
+Let's start by looking over the data we just acquired.
+
+```{r}
+glimpse(edges)
+glimpse(nodes)
+```
+
+This dataset represents 6,878 directed connections between the 630 households of a village. Each head of household was asked to report which household they (1) borrowed money from, (2) lend money to, (3) ask health advice from, (4) dispense health advice to (5) and socialize with. Our edgelist object contains shorthand for each of these connections.
+
+We also know some things about the households that participated in the survey. This information is contained in the nodelist and includes:
+
+* "id": The household id, referring to our "from" and "to" columns in the edges object.
+* "adultmems": The number of adult members of the household.
+* "any_kid": The number of children in the household.
+* "num_kid": If the household has at least one child.
+* "house_gender": The gender of the head of household, where a value of "1" is male, and "2" is female.
+* "house_rel": The religion of the head of household, where a value of "1" is hindu, and "2" is muslim.
+* "house_caste": The caste of the head of household, where a value of "1" is schedule caste, "2" is schedule tribe, "3" is other backward caste and "4" is a general caste.
+* "house_age": The average age of the household members.
+* "house_edu": The average education of household members.
+* "house_size": The total number of individuals in the household.
+
+This data is amenable to network analysis. But the implementation of network analysis in R is far from straightforward: the available tools in R are shared between several packages, each with their own strengths and weaknesses. This breadth of options can make it difficult to produce reliable results by making the correct function for a given measurement difficult to identify and, at worst, packages conflicting with each other and relying on different assumptions about the data. For many researchers, this can prove to be an effective deterrent when engaging in relational analysis.
+
+IDEANet allows the researcher to directly input their data and retrieve high-quality measurement in a format that facilitates subsequent analysis. In this vignette, we work through an example analysis as an opportunity to outline the core functions, arguments and outputs that compose the IDEANet toolkit.
+
+For example, we might wonder if the structure of the village network *looks different across lending, advice giving and socialization networks*. Furthermore, we might ask *which shared characteristic between two household make it more likely that a connection between them is reported?*
+
+Lets start by splitting the edgelist into the three aforementioned networks: a lending network, an advice giving network and a socialization network.
+
+```{r}
+health_edges <- edges %>% filter(tietype == "health") %>% select(-tietype)
+social_edges <- edges %>% filter(tietype == "social") %>% select(-tietype)
+```
+
+# IDEANet
+
+## Using Netwrite
+
+We can now load in the core netwrite() function. **Make sure that the appropriate path is set here.**
+
+```{r}
+library(devtools)
+install_github("https://github.com/Tom-Wolff/ideanet")
+library(ideanet)
+install_ideanetViz()
+IDEANETViz::ideanet_viz()
+
+```
+
+Netwrite is currently in development. Here are the features and arguments that are curently implemented:
+
+_Arguments pertaining to edges_
+
+* "data_type": Specifies the data format of the input data. Possible arguments are: "edgelist", "adjacency_list" and "adjacency_matrix".
+* "i_elements": Vector of egos' ids. 
+* "j_elements": Vector of alters' ids. 
+* "weights": Vector of weights. Default assumes no weights.
+* "weight_type": Specify how the weight vector should be interpreted. Possible arguments are: "frequency" and "distance".
+* "missing_code": Value associated with a missing tie -- in cases where the edge information contains both missing and existing ties. Expects a numerical value.
+* "directed": Specify if the edges should be interpreted as directed or undirected. Expects TRUE or FALSE logical.
+
+_Arguments pertaining to nodes_
+
+* "nodelist": Expects a vector of ids. Is particularly useful for including isolates who are present in the nodelist, but absent from input edges.
+
+_Arguments pertaining to output_
+
+* "node_id": Name assigned to the node id column in output nodelist. Expects a character argument.
+* "package": Format of the output network. Possible arguments are: "igraph" and "network".
+* "net_name": Name of the output network. Expects a character argument.
+* "output": Vector of outputs that should be constructed. By default, netwrite() returns every possible output. Possible arguments are: "graph", "largest_bi_component", "largest_component", "node_measure_plot", "nodelist", "edgelist", "system_level_measures", "system_measure_plot".
+* "message": Silence messages and warnings. Expects TRUE or FALSE logical.
+
+We can use netwrite() to understand key elements of the socialization network's structure. Note that netwrite() does not need to be saved as an object; instead, it returns the select outputs directly to the R environment.
+
+```{r}
+netwrite(data_type = "edgelist", 
+         i_elements = social_edges$from, 
+         j_elements = social_edges$to,
+         directed = T,
+         nodelist = nodes$id,
+         net_name = "socialize_network")
+```
+
+`netwrite` assigns a series of new objects to the R environment, each of which contains useful information on our input network.
+
+## Interpreting Netwrite output
+
+Netwrite() offers a variety of outputs that facilitate a clear interpretation of the network structure. Starting from the top, the output contains system level measures that tell the researcher about the network's overall characteristics.
+
+```{r}
+system_measure_plot
+```
+
+These measurements are also available in traditional table form
+
+```{r}
+socialize_system <- system_level_measures
+head(socialize_system) %>% paged_table()
+```
+
+Netwrite() also outputs a graph object (igraph, if specified) that contains each node and edge-level measurement computed within the function. This graph object allows for traditional network manipulation, such as plotting.
+
+```{r}
+plot(socialize_network, vertex.label = NA, vertex.size = 2, edge.arrow.size = 0.2)
+```
+
+Note that the output network contains both isolates and self-loops. Isolates were included when we defined a list of node ids (including isolate) in the "nodelist" argument of netwrite(). There is currently no method for removing self-loops within netwrite() -- instead, the user is expected to remove any unwanted edges before reading them into netwrite().
+
+In addition to the full network, researchers may be interested in the shape of major sub-components. Netwrite outputs two additional graph objects: the largest component in the network, and the largest bi-component of the network.
+
+```{r}
+plot(largest_component, vertex.label = NA, vertex.size = 2, edge.arrow.size = 0.2, 
+     main = "largest component")
+plot(largest_bi_component[[1]], vertex.label = NA, vertex.size = 2, edge.arrow.size = 0.2, 
+     main = "largest bi-component")
+```
+
+Netwrite() also outputs an edgelist dataframe of the same length as the input edges. This edgelist object contains unique dyad-level ids, internal ego and alter ids, the original id values and weights (uniformly set to 1 if no weights are defined).
+
+```{r}
+head(edgelist) %>% paged_table()
+```
+
+Lastly, netwrite() returns measurement at the node level as a dataframe of values and a plot of distributions. Certain measurements are computed only under certain weight and edge direction conditions -- that is, the nodelist only contains measurements appropriate to the network features.
+
+```{r}
+head(node_measures) %>% paged_table()
+node_measure_plot
+```
+
+Using netwrite(), it becomes trivial for scholars to compute complex structural measurement on existing relational data. The output of netwrite() is designed to facilitate the discovery process by providing key visualization that helps support the diagnostic process. 
+
+For instance, we can use the graph output from netwrite() to quickly compare our socialization, lending and advice networks.
+
+```{r, warning = F}
+# Run on lending network
+netwrite(data_type = "edgelist", i_elements = health_edges$from, 
+         j_elements = health_edges$to,
+         directed = T, nodelist = nodes$id, message = F,
+         net_name = "health_network")
+
+health_system <- system_level_measures # Save system level variables
+```
+
+```{r, echo = F}
+dev.off()
+```
+
+```{r}
+par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+plot(socialize_network, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "red", main = "socialize network")
+plot(health_network, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "gray", main = "health network")
+```
+
+At a glance, more of the village seems to be involved in the socialization network, and fewer are involved in the health advice network. We can use the system-level measurement to further explore these differences.
+
+```{r}
+vars <- c("Proportion in the Largest Weak Component", "Number of Weak Components", "Average Geodesic")
+
+res_socialize <- socialize_system %>% 
+  filter(measure_labels %in% vars) %>% 
+  select(measure_labels, measures) %>% mutate(network = "socialize")
+
+res_health <- health_system %>% 
+  filter(measure_labels %in% vars) %>% 
+  select(measure_labels, measures) %>% mutate(network = "health")
+
+
+
+rbind(res_socialize, res_health) %>% arrange(measure_labels) %>% paged_table()
+```
+
+The significantly lower number of isolates in the socialization network is reflected in the smaller number of weak components overall, with just over 19% of nodes in the largest component. The advice network has a similarly-sized largest component (19.8%), but has far more total components as a result of isolation.
+
+## Multi-relational networks
+
+In the previous example, we create three different networks based on three unique kinds of relationships between the households in the village of study. An alternative is to ask netwrite() to create sub-networks based on each type of tie by inputting the variable that differentiates those ties in the "type" argument. In this case, we have five different kinds of ties.
+
+```{r, warning = F}
+netwrite(data_type = "edgelist", 
+         i_elements = edges$from, 
+         j_elements = edges$to,
+         directed = T,
+         nodelist = nodes,
+         node_id = "id",
+         type=edges$tietype, # the tie type variable
+         message = F,
+         net_name = "village_network")
+```
+
+When given a multi-relational network to work with, netwrite() will return the outputs described previously in slightly different ways. First, we can see that the "edgelist" object contains every type of tie, and comes paired with a list object "edgelists_list" that separates each type of connection into their own edgelist. 
+
+```{r}
+head(edgelist) %>% paged_table()
+summary(edgelist_list)
+```
+
+The same is true of the "node_measures" object and its associated list object "node_measures_list". For node measurements, variables with no tie-type prefix are calculated using every type of tie, while measurements calculated on a specific sub-network have the associated tie-type prefix. In this example, we see 6 different values for total degree.
+
+```{r}
+node_measures %>% 
+  select(id, total_degree, social_total_degree, `health_total_degree`) %>%
+  head() %>% paged_table()
+```
+
+Every other expected output are constructed as list objects and have the "_list" suffix. Lists can be accessed to reproduce the result we presented earlier. For example, I can access the "network_list" object and extract the three graphs we had to produced individually in the previous section:
+
+```{r}
+summary(network_list) # Check in which position each sub-network is
+
+par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+plot(network_list$summary_graph, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "red", main = "overall network")
+plot(network_list$health, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "gray", main = "health network")
+plot(network_list$social, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "green", main = "socialize network")
+```
+
+
+## Analysis modules
+
+IDEANet also includes an analysis component. Individual analysis modules allow the researcher to take the output of the core netwrite function and apply network-centric models, considerably expanding possibilities for interpretation. Currently, the Multiple Regression Quadratic Assignment Procedure (MRQAP) and Role-Analysis modules are available. We expect to expand the number of models as development on IDEANet move forward.
+
+### MRQAP
+
+MRQAP is an extension of the Mantel test which uses node-permutation in order to get around issues of non-independence that make a traditional regression analysis difficult when using network data. This model can help us answer our second question: _which shared household characteristics are associated with a greater likelihood of a nomination?_
+
+Analysis modules are distinct from the netwrite function and need to be sourced independently.
+
+Some of the shared household characteristics is information that is associated with the nodes we originally brought in from the Duke University Library dataverse. That information was not included in netwrite() -- we need to merge those values into our existing networks first. **This was going the be a feature of MRQAP, but it might be worth making it a feature of netwrite?**
+
+```{r}
+socialize_network <- as_data_frame(network_list$social, what = "both")
+socialize_network[[1]] <- socialize_network[[1]] %>% 
+  left_join(nodes %>% rename(attr = id), by = "attr")
+socialize_network <- graph_from_data_frame(socialize_network[[2]], 
+                                           vertices = socialize_network[[1]], directed = T)
+
+health_network <- as_data_frame(network_list$health, what = "both")
+health_network[[1]] <- health_network[[1]] %>% 
+  left_join(nodes %>% rename(attr = id), by = "attr")
+health_network <- graph_from_data_frame(health_network[[2]], 
+                                           vertices = health_network[[1]], directed = T)
+```
+
+Our network object now contains all node-level information that was contained in our original data, in addition to the measurements produced by netwrite(). As we noted in our exploration of the data, we know if the household is female or male led, and the religious affiliation of the head of household, among other things. However, this information is *individual-level* (or rather, household-level) rather than being *dyad-level*. In the context of MRQAP, we are interested in the differences or similarities between each connected household. Qap_setup() helps the researcher convert individual-level values into dyad-level comparisons by following a set of methods:
+
+* "net": An igraph or network object.
+* "variables": A vector of variable names that are available in the network object.
+* "methods": A vector of method names that are applied **in order** to the vector of variables.
+  * "multi_category": Applies to categorical variables only. Creates as many variables as there are unique values; each variable signals if both ego and alter have the given value.
+  * "reduced_category": Applies to categorical variables only. Creates a single variable that signals if alter and ego have the same value.
+  * "both": Applies to categorical variables only. Computes both the "multi_category" and "reduced_category" methods.
+  * "difference": Computes the difference in input value between ego and alter.
+* "directed": Specify if the edges should be interpreted as directed or undirected. Expects TRUE or FALSE logical.
+
+For this analysis, we are interested in the relationship between shared female household status, difference in total household degree and shared household religion.
+
+```{r, warning = F, message = F}
+qap_setup(net = network_list$social, 
+          variables = c("house_gender", "total_degree", "house_rel"),
+          methods = c("multi_category", "difference", "reduced_category"), 
+          directed = T)
+```
+
+Qap_setup() produces a list object "qap_results" that contains: 
+
+* An igraph object that includes the newly computed edge variables
+* A nodelist 
+* An edgelist that includes the newly computed variables. 
+
+For example, we requested for the "multi_category" method to be applied to the node-level variable "house_gender". "house_gender" can take on a value of "1" (male-headed household) or "2" (female-headed household).
+
+```{r}
+qap_results[[2]] %>% select(from:both_house_gender_1) %>% head() %>% paged_table()
+```
+
+Qap_setup() function returns four new variables. Variables appended with "_ego" and "_alter" represent the original values determined in the nodelist. An additional variable is created for each of the two unique values that "house_gender" can take on: "both_house_gender_2" tells us if both ego and alter are households that are led by female respondents.
+
+With our variables of interest in hand, we turn to the MRQAP analysis itself. The IDEANet MRQAP module provides the qap_run() function which integrates seamlessly with the output from netwrite() and qap_setup(). Arguments for qap_run() include:
+
+* "net": An igraph object containing the variables of interest.
+* "dependent": A single categorical or continuous variable name to use as a dependent variable. If the dependent is set to NULL (default), the function will predict the existence of a non-weighted tie.
+* "variables": A vector of variable names to use as independent variables.
+* "directed": Specify if the edges should be interpreted as directed or undirected. Expects TRUE or FALSE logical.
+* "reps": Select the number of permutations. Relevant to null-hypothesis testing only. Default is set to 1000.
+* "family": The functional form the model should follow. Currently available are "linear" and "binomial". 
+  * **NOTE:** Binomial MRQAP is very sensitive to model specification; for exploratory purposes, it is recommended to stick to a linear functional form.
+
+We significantly decrease the number of permutations to allow for lower computation times, though this may make our confidence intervals less interpretable.
+
+```{r}
+# Runs 
+qap_run(net = qap_results[[1]], 
+        variables = c("both_house_gender_2", "diff_total_degree", "same_house_rel"),
+        dependent = NULL, 
+        directed = T,
+        reps = 20,
+        family = "linear")
+
+model_results[[1]]
+```
+
+The MRAQP analysis outputs a list of two objects. The first contains a summary of model results akin to a traditional regression output. In this analysis, it is clear that shared household religion plays a major factor in the production of a socialization network, net of the difference in household degree and whether both households are female-led. 
+
+The second network object provides the number of dyadic observations on which the model is computed.
+
+### Role analysis 
+
+Role analysis groups nodes together who have similar relational characteristics, rather than the individuals characteristics of nodes themselves. There are many approaches to clustering in social networks, based on modularity maximization (e.g, Louvain, SLM, hierarchical clustering) or principles of information theory (e.g, Infomap). Currently, the hierarchical clustering method is available.
+
+We begin by sourcing the role_analysis() function and a dataset of relationships among Florentine families. We also source a supporting triadic census function which will provide additional relational features for the clustering of nodes.
+
+```{r}
+padgett <- read.csv("/Users/gabe/Dropbox/IDEANet/role_analysis/test_networks/padgett.csv")
+source("/Users/gabe/Documents/Projects/IDEAnet/code/role_analysis/role_analysis.R")
+source("/Users/gabe/Documents/Projects/IDEAnet/code/role_analysis/triad_census.R")
+```
+
+The role_analysis() function takes the follow arguments:
+
+* "graph": An igraph object generated by netwrite().
+* "nodes": A nodelist object generated by netwrite().
+* "directed": Specify if the edges should be interpreted as directed or undirected. Expects TRUE or FALSE logical.
+* "method": Method of role inference. Only "cluster" currently available.
+* "min_clusters": Minimum number of clusters to test.
+* "max_clusters": Maximum number of clusters to test.
+* "retain_variables": Output a dataframe of variables used in clustering. Expects TRUE or FALSE logical.
+* "cluster_summaries": = Output a dataframe containing mean values of clustering variables within each cluster. Expects TRUE or FALSE logical.
+* "viz": Output summary visualizations. Expects TRUE or FALSE logical.
+
+We then pass the Florentine families dataset into netwrite() to extract node-level network features.
+
+```{r}
+IDEANet_Utilities$netwrite(data_type = "edgelist",
+                           adjacency_matrix <- FALSE,
+                           adjacency_list <- F,
+                           nodelist = FALSE,
+                           i_elements =  padgett$ego,
+                           j_elements = padgett$alter,
+                           weights = NULL,
+                           directed = FALSE,
+                           missing_code = 99999,
+                           type = NULL,
+                           net_name = 'g',
+                           package = 'network',
+                           weight_type='frequency',
+                           shiny = TRUE)
+```
+
+Next, we can pass on the resulting igraph object and the results stored in the "nodelist" object to the role_analysis() function.
+
+```{r, fig.show='hide'}
+role_analysis(graph = g,
+              nodes = nodelist,
+              min_clusters = 2, max_clusters = 8,
+              retain_variables = TRUE,
+              cluster_summaries = TRUE,
+              viz = TRUE)
+```
+
+The role_analysis() function acts similarly to the netwrite() function by outputting results directly into the R environment. The function outputs 6 types of objects. First, users can check on the features that are used to produce the clustering in the first place.
+
+```{r}
+head(clustering_variables) %>% paged_table()
+```
+
+The variables include a set of node-level measurements and their standardized equivalents constructed in netwrite().
+
+role_analysis() looks for the number of clusters, within the range defined by the user, that maximize modularity. This cluster solution is subsequently used for each of the other outputs. The user can view the modularity results accross cluster solutions as either a graph or dendogram. 
+
+```{r}
+cluster_dendrogram
+cluster_modularity
+```
+
+In this case, the 6-cluster solution seems to best explain differences among the Florentine families. We can also visualize this clustering solutions as a traditional sociogram. 
+
+```{r, layout = "l-body-outset"}
+cluster_sociogram
+```
+
+The assignment of each node to a cluster within each of the cluster solutions can be used in further statistical modeling to capture node similarity.
+
+```{r}
+head(cluster_assignments) %>% paged_table()
+```
+
+

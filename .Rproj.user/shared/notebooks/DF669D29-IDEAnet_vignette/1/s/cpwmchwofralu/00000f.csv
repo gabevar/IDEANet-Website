@@ -1,0 +1,9 @@
+"0","setwd(dirname(rstudioapi::getSourceEditorContext()$path))"
+"0","if (!require(""pacman"", character.only = TRUE)) {install.packages(""pacman"", dep=TRUE)}"
+"2","Loading required package: pacman
+"
+"0","pacman::p_load(remotes, tidyverse, rmarkdown, igraph)"
+"0","if (!require(""dataverse"", character.only = TRUE)) {remotes::install_github(""iqss/dataverse-client-r"")}"
+"2","Loading required package: dataverse
+"
+"0","knitr::opts_chunk$set(layout = ""l-body-outset"")"

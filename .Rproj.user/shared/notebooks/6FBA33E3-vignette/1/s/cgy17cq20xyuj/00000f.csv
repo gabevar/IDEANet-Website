@@ -1,0 +1,16 @@
+"0","netwrite(data_type = ""edgelist"", "
+"0","         i_elements = fauxmesa_edges$from, "
+"0","         j_elements = fauxmesa_edges$to,"
+"0","         directed = T)"
+"2","(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Eigenvector centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Eigenvector centrality) Network consists of 2+ unconnected components. Eigenvector centrality scores will be calculated for nodes based on their position within their respective components.
+
+"

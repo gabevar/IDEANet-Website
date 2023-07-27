@@ -3,12 +3,15 @@ project:
   output-dir: docs
 
 website:
-  title: "IDEANet website"
+  title: "IDEANet"
   navbar:
     left:
       - href: index.qmd
         text: Home
-      - about.qmd
+      - href: vignette.qmd
+        text: R Vignette
+      - href: contact_us.qmd
+        text: Contact Us
 
 format:
   html:

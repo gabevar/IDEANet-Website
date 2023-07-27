@@ -1,0 +1,2 @@
+"0","plot(largest_component, vertex.label = NA, vertex.size = 2, edge.arrow.size = 0.2, "
+"0","     main = ""largest component"")"

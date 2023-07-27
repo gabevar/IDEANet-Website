@@ -1,0 +1,25 @@
+"0","netwrite(data_type = ""edgelist"", "
+"0","         i_elements = fauxmesa_edges$from, "
+"0","         j_elements = fauxmesa_edges$to,"
+"0","         directed = T,"
+"0","         nodelist = fauxmesa_nodes$id,"
+"0","         net_name = ""fauxmesa_network"")"
+"2","(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.
+"
+"2","(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.
+"
+"2","(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Eigenvector centrality) Isolates detected in network. Isolates will be removed from network when calculating eigenvector centrality measure, and will be assigned NA values in final output.
+
+"
+"2","(Eigenvector centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
+
+"
+"2","(Eigenvector centrality) Network consists of 2+ unconnected components. Eigenvector centrality scores will be calculated for nodes based on their position within their respective components.
+
+"
