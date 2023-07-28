@@ -149,7 +149,13 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#core-analysis-netwrite" id="toc-core-analysis-netwrite" class="nav-link" data-scroll-target="#core-analysis-netwrite">Core Analysis: Netwrite()</a>
   <ul class="collapse">
   <li><a href="#running-netwrite" id="toc-running-netwrite" class="nav-link" data-scroll-target="#running-netwrite">Running netwrite()</a></li>
-  <li><a href="#netwrite-interpretation" id="toc-netwrite-interpretation" class="nav-link" data-scroll-target="#netwrite-interpretation">Netwrite() interpretation</a></li>
+  <li><a href="#netwrite-interpretation" id="toc-netwrite-interpretation" class="nav-link" data-scroll-target="#netwrite-interpretation">netwrite() interpretation</a></li>
+  <li><a href="#multilayered-networks" id="toc-multilayered-networks" class="nav-link" data-scroll-target="#multilayered-networks">Multilayered networks</a></li>
+  </ul></li>
+  <li><a href="#analysis-modules" id="toc-analysis-modules" class="nav-link" data-scroll-target="#analysis-modules">Analysis Modules</a>
+  <ul class="collapse">
+  <li><a href="#mrqap" id="toc-mrqap" class="nav-link" data-scroll-target="#mrqap">MRQAP</a></li>
+  <li><a href="#role-analysis" id="toc-role-analysis" class="nav-link" data-scroll-target="#role-analysis">Role Analysis</a></li>
   </ul></li>
   </ul>
 </nav>
@@ -181,26 +187,20 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Getting Set Up</h1>
 <p>Lets begin by importing IDEANet. IDEANet is currently available only as a Github package and requires a direct download using devtools.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Loading required package: usethis</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"https://github.com/Tom-Wolff/ideanet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output cell-output-stderr">
-<pre><code>Skipping install of 'ideanet' from a github remote, the SHA1 (a5f256cd) has not changed since last install.
-  Use `force = TRUE` to force installation</code></pre>
-</div>
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ideanet)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(devtools)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">install_github</span>(<span class="st">"https://github.com/Tom-Wolff/ideanet"</span>)</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ideanet)</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In this vignette, we will be using the datasets included with the package. IDEANet comes with a variety of datasets we can explore using the <code>data()</code> function</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="at">package =</span> <span class="st">"ideanet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(<span class="at">package =</span> <span class="st">"ideanet"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>In this vignette, we will use the Fauxmesa dataset. The data represents a simulation of friendships among students in a school. The data are directed, unweighted and contain a single layer of friendships. We also know some things about these students – what grade they are in (“grade”), what race they identify with (“race”) and what sex they identify with (“sex”).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fauxmesa)</span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fauxmesa_edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fauxmesa)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fauxmesa_edges)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  from to
 1    1 25
@@ -210,7 +210,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 5    1 87
 6    1 92</code></pre>
 </div>
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fauxmesa_nodes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(fauxmesa_nodes)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id grade  race sex
 1  1     7  Hisp   F
@@ -232,16 +232,16 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Core Analysis: Netwrite()</h1>
 <section id="running-netwrite" class="level2">
 <h2 class="anchored" data-anchor-id="running-netwrite">Running netwrite()</h2>
-<p>The central analysis component of IDEANet is accessed via the <code>netwrite()</code> function. <code>Netwrite()</code> comes with a breadth of arguments described in the <code>netwrite()</code> documentation. The documentation can be accessed with the following code, or by via our webpage (link).</p>
+<p>The central analysis component of IDEANet is accessed via the <code>netwrite()</code> function. <code>netwrite()</code> comes with a breadth of arguments described in the <code>netwrite()</code> documentation. The documentation can be accessed with the following code, or by via our webpage (link).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>?<span class="fu">netwrite</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>?<span class="fu">netwrite</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Returning to our high-school example, we can ask IDEANet to return basic network measurements on the network by including some basic arguments: what kind of network object we are using – in this case, an edgelist – and some information about sources, targets and their directionality.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
-<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> fauxmesa_edges<span class="sc">$</span>from, </span>
-<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> fauxmesa_edges<span class="sc">$</span>to,</span>
-<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> fauxmesa_edges<span class="sc">$</span>from, </span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> fauxmesa_edges<span class="sc">$</span>to,</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures
 
@@ -254,27 +254,28 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <pre><code>(Eigenvector centrality) Network consists of 2+ unconnected components. Eigenvector centrality scores will be calculated for nodes based on their position within their respective components.</code></pre>
 </div>
 </div>
-<p>Netwrite() includes a series of warnings that warns you about the way certain measurements are calculated. In this case, while most metrics are calculated as directed (as we requested in the function), some functions such as power centrality and eigenvector centrality require interpreting the network as undirected.</p>
+<p><code>netwrite()</code> includes a series of warnings that warns you about the way certain measurements are calculated. In this case, while most metrics are calculated as directed (as we requested in the function), some functions such as power centrality and eigenvector centrality require interpreting the network as undirected.</p>
 <p>While this successfully returned the metric we will be exploring further in this vignette, netwrite() has additional quality of life arguments that we can use with our example. For example, we want to include node level attributes and change the name of our output network.</p>
 <p>However, notice that there are students in our nodelist that don’t exist in our edgelist.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(fauxmesa_nodes<span class="sc">$</span>id, fauxmesa_edges<span class="sc">$</span>from) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">setdiff</span>(fauxmesa_nodes<span class="sc">$</span>id, fauxmesa_edges<span class="sc">$</span>from) <span class="sc">%&gt;%</span> <span class="fu">head</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>[1]  3  4  6  7 10 12</code></pre>
 </div>
 </div>
-<p>This is usually difficult for igraph to handle. In this case, netwrite() will consider additional student’s as isolates in the network, and provide a warning that it is doing so.</p>
+<p>In this case, <code>netwrite()</code> will consider additional student’s as isolates in the network.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># get a clean slate</span></span>
-<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fauxmesa) <span class="co"># bring in our data again</span></span>
-<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
-<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> fauxmesa_edges<span class="sc">$</span>from, </span>
-<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> fauxmesa_edges<span class="sc">$</span>to,</span>
-<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> T,</span>
-<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">nodelist =</span> fauxmesa_nodes<span class="sc">$</span>id,</span>
-<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">net_name =</span> <span class="st">"fauxmesa_network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># get a clean slate</span></span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fauxmesa) <span class="co"># bring in our data again</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> fauxmesa_edges<span class="sc">$</span>from, </span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> fauxmesa_edges<span class="sc">$</span>to,</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> T,</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">nodelist =</span> fauxmesa_nodes,</span>
+<span id="cb14-10"><a href="#cb14-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">node_id =</span> <span class="st">"id"</span>,</span>
+<span id="cb14-11"><a href="#cb14-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">net_name =</span> <span class="st">"fauxmesa_network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output cell-output-stderr">
 <pre><code>(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.</code></pre>
 </div>
@@ -299,17 +300,17 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </section>
 <section id="netwrite-interpretation" class="level2">
-<h2 class="anchored" data-anchor-id="netwrite-interpretation">Netwrite() interpretation</h2>
-<p>Netwrite() offers a variety of outputs that facilitate a clear interpretation of the network structure. Starting from the top, the output contains system level measures that tell the researcher about the network’s overall characteristics.</p>
+<h2 class="anchored" data-anchor-id="netwrite-interpretation">netwrite() interpretation</h2>
+<p><code>netwrite()</code> offers a variety of outputs that facilitate a clear interpretation of the network structure. Starting from the top, the output contains system level measures that tell the researcher about the network’s overall characteristics.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>system_measure_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>system_measure_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="vignette_files/figure-html/unnamed-chunk-8-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>These measurements are also available in traditional table form.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>system_level_measures <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>system_level_measures <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -319,33 +320,33 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Netwrite() also outputs a graph object that contains each node and edge-level measurement computed within the function. This graph object allows for traditional network manipulation, such as plotting.</p>
+<p><code>netwrite()</code> also outputs a graph object that contains each node and edge-level measurement computed within the function. This graph object allows for traditional network manipulation, such as plotting.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fauxmesa_network, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(fauxmesa_network, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="vignette_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Note that the output network can contain both isolates and self-loops. Isolates were included when we defined a list of node ids (including isolate) in the “nodelist” argument of netwrite(). There is currently no method for removing self-loops within netwrite() - instead, the user is expected to remove any unwanted edges before reading them into netwrite().</p>
-<p>In addition to the full network, researchers may be interested in the shape of major sub-components. Netwrite outputs two additional graph objects: the largest component in the network.</p>
+<p>Note that the output network can contain both isolates and self-loops. Isolates were included when we defined a list of node ids (including isolate) in the “nodelist” argument of <code>netwrite()</code>. There is currently no method for removing self-loops within <code>netwrite()</code> - instead, the user is expected to remove any unwanted edges before reading them into <code>netwrite()</code>.</p>
+<p>In addition to the full network, researchers may be interested in the shape of major sub-components. <code>netwrite()</code> outputs two additional graph objects: the largest component in the network.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(largest_component, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
-<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"largest component"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(largest_component, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"largest component"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="vignette_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
 <p>And the largest bi-component of the network.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(largest_bi_component, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
-<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"largest bi-component"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(largest_bi_component, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">3</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>     <span class="at">main =</span> <span class="st">"largest bi-component"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="vignette_files/figure-html/unnamed-chunk-12-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
-<p>Netwrite() also outputs an edgelist dataframe of the same length as the input edges. This edgelist object contains unique dyad-level ids, internal ego and alter ids, the original id values and weights (uniformly set to 1 if no weights are defined).</p>
+<p><code>netwrite()</code> also outputs an edgelist dataframe of the same length as the input edges. This edgelist object contains unique dyad-level ids, internal ego and alter ids, the original id values and weights (uniformly set to 1 if no weights are defined).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(edgelist) <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(edgelist) <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
@@ -355,22 +356,437 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </div>
 </div>
 </div>
-<p>Lastly, netwrite() returns measurement at the node level as a dataframe of values and a plot of distributions. Certain measurements are computed only under certain weight and edge direction conditions - that is, the nodelist only contains measurements appropriate to the network features.</p>
+<p>Lastly, <code>netwrite()</code> returns measurement at the node level as a dataframe of values and a plot of distributions. Certain measurements are computed only under certain weight and edge direction conditions - that is, the nodelist only contains measurements appropriate to the network features.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(node_measures) <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(node_measures) <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <div data-pagedtable="false">
   <script data-pagedtable-source="" type="application/json">
-{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["id"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["attr"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["weak_membership"],"name":[3],"type":["int"],"align":["right"]},{"label":["in_largest_weak"],"name":[4],"type":["lgl"],"align":["right"]},{"label":["strong_membership"],"name":[5],"type":["int"],"align":["right"]},{"label":["in_largest_strong"],"name":[6],"type":["lgl"],"align":["right"]},{"label":["total_degree"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["weighted_degree"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["in_degree"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["out_degree"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["weighted_indegree"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["weighted_outdegree"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["closeness"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["binarized_betweenness"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["betweenness"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["bonpow"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["bonpow_negative"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["eigen_centrality"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["component"],"name":[19],"type":["int"],"align":["right"]},{"label":["burt_constraint"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["burt_hierarchy"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["effective_size"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_in"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_out"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_all"],"name":[25],"type":["dbl"],"align":["right"]},{"label":["in_largest_bicomponent"],"name":[26],"type":["lgl"],"align":["right"]}],"data":[{"1":"0","2":"1","3":"1","4":"TRUE","5":"171","6":"FALSE","7":"13","8":"13","9":"0","10":"13","11":"0","12":"13","13":"22.250000","14":"0","15":"0","16":"4.4649993","17":"4.3274746","18":"4.721009e-01","19":"1","20":"0.1303632","21":"0.07052337","22":"13","23":"0.004878049","24":"0.170731707","25":"0.585365854","26":"TRUE","_rn_":"1"},{"1":"1","2":"2","3":"1","4":"TRUE","5":"170","6":"FALSE","7":"4","8":"4","9":"0","10":"4","11":"0","12":"4","13":"6.666667","14":"0","15":"0","16":"1.1039468","17":"1.2566261","18":"9.601053e-02","19":"1","20":"0.3281250","21":"0.05453950","22":"4","23":"0.004878049","24":"0.053658537","25":"0.585365854","26":"TRUE","_rn_":"2"},{"1":"2","2":"3","3":"12","4":"FALSE","5":"169","6":"FALSE","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0.000000","14":"0","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"1.0000000","21":"NA","22":"0","23":"0.004878049","24":"0.004878049","25":"0.004878049","26":"NA","_rn_":"3"},{"1":"3","2":"4","3":"13","4":"FALSE","5":"168","6":"FALSE","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0.000000","14":"0","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"1.0000000","21":"NA","22":"0","23":"0.004878049","24":"0.004878049","25":"0.004878049","26":"NA","_rn_":"4"},{"1":"4","2":"5","3":"1","4":"TRUE","5":"166","6":"FALSE","7":"1","8":"1","9":"0","10":"1","11":"0","12":"1","13":"1.000000","14":"0","15":"0","16":"0.1427034","17":"0.2878193","18":"4.552939e-06","19":"1","20":"1.0000000","21":"1.00000000","22":"1","23":"0.004878049","24":"0.009756098","25":"0.585365854","26":"NA","_rn_":"5"},{"1":"5","2":"6","3":"14","4":"FALSE","5":"165","6":"FALSE","7":"0","8":"0","9":"0","10":"0","11":"0","12":"0","13":"0.000000","14":"0","15":"0","16":"NA","17":"NA","18":"NA","19":"NA","20":"1.0000000","21":"NA","22":"0","23":"0.004878049","24":"0.004878049","25":"0.004878049","26":"NA","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["id"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["original_id"],"name":[2],"type":["chr"],"align":["left"]},{"label":["grade"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["race"],"name":[4],"type":["chr"],"align":["left"]},{"label":["sex"],"name":[5],"type":["chr"],"align":["left"]},{"label":["weak_membership"],"name":[6],"type":["int"],"align":["right"]},{"label":["in_largest_weak"],"name":[7],"type":["lgl"],"align":["right"]},{"label":["strong_membership"],"name":[8],"type":["int"],"align":["right"]},{"label":["in_largest_strong"],"name":[9],"type":["lgl"],"align":["right"]},{"label":["total_degree"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["weighted_degree"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["in_degree"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["out_degree"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["weighted_indegree"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["weighted_outdegree"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["closeness"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["binarized_betweenness"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["betweenness"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["bonpow"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["bonpow_negative"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["eigen_centrality"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["component"],"name":[22],"type":["int"],"align":["right"]},{"label":["burt_constraint"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["burt_hierarchy"],"name":[24],"type":["dbl"],"align":["right"]},{"label":["effective_size"],"name":[25],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_in"],"name":[26],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_out"],"name":[27],"type":["dbl"],"align":["right"]},{"label":["proportion_reachable_all"],"name":[28],"type":["dbl"],"align":["right"]},{"label":["in_largest_bicomponent"],"name":[29],"type":["lgl"],"align":["right"]}],"data":[{"1":"0","2":"1","3":"7","4":"Hisp","5":"F","6":"1","7":"TRUE","8":"171","9":"FALSE","10":"13","11":"13","12":"0","13":"13","14":"0","15":"13","16":"22.250000","17":"0","18":"0","19":"4.4649993","20":"4.3274746","21":"4.721009e-01","22":"1","23":"0.1303632","24":"0.07052337","25":"13","26":"0.004878049","27":"0.170731707","28":"0.585365854","29":"TRUE","_rn_":"1"},{"1":"1","2":"2","3":"7","4":"Hisp","5":"F","6":"1","7":"TRUE","8":"170","9":"FALSE","10":"4","11":"4","12":"0","13":"4","14":"0","15":"4","16":"6.666667","17":"0","18":"0","19":"1.1039468","20":"1.2566261","21":"9.601053e-02","22":"1","23":"0.3281250","24":"0.05453950","25":"4","26":"0.004878049","27":"0.053658537","28":"0.585365854","29":"TRUE","_rn_":"2"},{"1":"2","2":"3","3":"11","4":"NatAm","5":"M","6":"12","7":"FALSE","8":"169","9":"FALSE","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0.000000","17":"0","18":"0","19":"NA","20":"NA","21":"NA","22":"NA","23":"1.0000000","24":"NA","25":"0","26":"0.004878049","27":"0.004878049","28":"0.004878049","29":"NA","_rn_":"3"},{"1":"3","2":"4","3":"8","4":"Hisp","5":"M","6":"13","7":"FALSE","8":"168","9":"FALSE","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0.000000","17":"0","18":"0","19":"NA","20":"NA","21":"NA","22":"NA","23":"1.0000000","24":"NA","25":"0","26":"0.004878049","27":"0.004878049","28":"0.004878049","29":"NA","_rn_":"4"},{"1":"4","2":"5","3":"10","4":"White","5":"F","6":"1","7":"TRUE","8":"166","9":"FALSE","10":"1","11":"1","12":"0","13":"1","14":"0","15":"1","16":"1.000000","17":"0","18":"0","19":"0.1427034","20":"0.2878193","21":"4.552939e-06","22":"1","23":"1.0000000","24":"1.00000000","25":"1","26":"0.004878049","27":"0.009756098","28":"0.585365854","29":"NA","_rn_":"5"},{"1":"5","2":"6","3":"10","4":"Hisp","5":"F","6":"14","7":"FALSE","8":"165","9":"FALSE","10":"0","11":"0","12":"0","13":"0","14":"0","15":"0","16":"0.000000","17":"0","18":"0","19":"NA","20":"NA","21":"NA","22":"NA","23":"1.0000000","24":"NA","25":"0","26":"0.004878049","27":"0.004878049","28":"0.004878049","29":"NA","_rn_":"6"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
   </script>
 </div>
 </div>
-<div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>node_measure_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>node_measure_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <p><img src="vignette_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
 </div>
 </div>
+</section>
+<section id="multilayered-networks" class="level2">
+<h2 class="anchored" data-anchor-id="multilayered-networks">Multilayered networks</h2>
+<p>IDEANet can also handle multilayered networks. For example, we may be interested in both marriage and business between elite Florentine families that gave rise to the prominence of the house of Medici. This data is available in the IDEANet package and contains a <code>layer</code> column that indicates if the relationships are marriage ties or business ties.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb30"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># get a clean slate</span></span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(florentine) <span class="co"># bring in our florentine families data</span></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a>florentine <span class="ot">&lt;-</span> florentine <span class="sc">%&gt;%</span> </span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">layer =</span> <span class="fu">case_when</span>(layer <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">"marriage"</span>, T <span class="sc">~</span> <span class="st">"business"</span>))</span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(florentine, <span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>   node target weight    layer
+1     0      8      1 marriage
+2     1      5      1 marriage
+3     1      6      1 marriage
+4     1      8      1 marriage
+5     2      4      1 marriage
+6     2      8      1 marriage
+7     2      4      1 business
+8     2      5      1 business
+9     2      8      1 business
+10    2     10      1 business</code></pre>
+</div>
+</div>
+<p>Taking advantage of these layers in <code>netwrite()</code> is easy: just indicate which column contains your layer information using the <code>type</code> argument.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb32"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> florentine<span class="sc">$</span>node, </span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> florentine<span class="sc">$</span>target,</span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> F,</span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a>         <span class="at">type =</span> florentine<span class="sc">$</span>layer, <span class="co"># indicate layer variable</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">net_name =</span> <span class="st">"florentine_network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing network for edge type marriage</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing network for edge type business</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.
+(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Eigenvector centrality) Isolates detected in network. Isolates will be removed from network when calculating eigenvector centrality measure, and will be assigned NA values in final output.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Processing aggregate network of all edge types</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>Joining with `by = join_by(id, attr)`
+Joining with `by = join_by(id, attr)`</code></pre>
+</div>
+</div>
+<p>Running <code>netwrite()</code> on multi-layered network will yield some additional warnings that <code>netwrite()</code> is being computed on each layer separately, and on a network containing aggregated layers.</p>
+<p>When given a multi-layered network to work with, <code>netwrite()</code> will return the outputs described previously in slightly different ways. First, we can see that the <code>edgelist</code> object contains every type of tie, and comes paired with a list object <code>edgelists_list</code> that separates each type of connection into their own edgelist.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(edgelist) <span class="sc">%&gt;%</span> rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":[""],"name":["_rn_"],"type":[""],"align":["left"]},{"label":["Obs_ID"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["i_elements"],"name":[2],"type":["chr"],"align":["left"]},{"label":["i_id"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["j_elements"],"name":[4],"type":["chr"],"align":["left"]},{"label":["j_id"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["weight"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["type"],"name":[7],"type":["chr"],"align":["left"]}],"data":[{"1":"1","2":"0","3":"0","4":"8","5":"8","6":"1","7":"marriage","_rn_":"1"},{"1":"2","2":"1","3":"1","4":"5","5":"5","6":"1","7":"marriage","_rn_":"2"},{"1":"3","2":"1","3":"1","4":"6","5":"6","6":"1","7":"marriage","_rn_":"3"},{"1":"4","2":"1","3":"1","4":"8","5":"8","6":"1","7":"marriage","_rn_":"4"},{"1":"5","2":"2","3":"2","4":"4","5":"4","6":"1","7":"marriage","_rn_":"5"},{"1":"7","2":"2","3":"2","4":"4","5":"4","6":"1","7":"business","_rn_":"7"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+<div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(edgelist_list)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Length Class      Mode
+summary_graph 7      data.frame list
+marriage      6      data.frame list
+business      6      data.frame list</code></pre>
+</div>
+</div>
+<p>The same is true of the <code>node_measures</code> object and its associated list object <code>node_measures_list</code>. For node measurements, variables with no tie-type prefix are calculated using every type of tie, while measurements calculated on a specific sub-network have the associated tie-type prefix. For example, in this example we see 3 different values for total degree, one for marriage ties, one for business ties and a value without prefix that represents the metric for the aggregate network.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb42"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>node_measures <span class="sc">%&gt;%</span> </span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(id, total_degree, marriage_total_degree, business_total_degree) <span class="sc">%&gt;%</span></span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  rmarkdown<span class="sc">::</span><span class="fu">paged_table</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<div data-pagedtable="false">
+  <script data-pagedtable-source="" type="application/json">
+{"columns":[{"label":["id"],"name":[1],"type":["dbl"],"align":["right"]},{"label":["total_degree"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["marriage_total_degree"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["business_total_degree"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"0","2":"1","3":"1","4":"0"},{"1":"1","2":"3","3":"3","4":"0"},{"1":"2","2":"6","3":"2","4":"4"},{"1":"3","2":"6","3":"3","4":"3"},{"1":"4","2":"6","3":"3","4":"3"},{"1":"5","2":"3","3":"1","4":"2"},{"1":"6","2":"6","3":"4","4":"2"},{"1":"7","2":"5","3":"1","4":"4"},{"1":"8","2":"11","3":"6","4":"5"},{"1":"9","2":"2","3":"1","4":"1"},{"1":"10","2":"7","3":"3","4":"4"},{"1":"11","2":"3","3":"3","4":"0"},{"1":"12","2":"3","3":"2","4":"1"},{"1":"13","2":"4","3":"4","4":"0"},{"1":"14","2":"4","3":"3","4":"1"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+</div>
+</div>
+<p>Every other expected output are constructed as list objects and have the “_list” suffix. Lists can be accessed to access metric at different layers of the network, or the network with aggregated layers. For example, we can access the “network_list” object and extract the three layer-associated graphs.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(network_list) <span class="co"># Check in which position each sub-network is</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>              Length Class  Mode
+summary_graph 15     igraph list
+marriage      15     igraph list
+business      15     igraph list</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb45"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="fu">par</span>(<span class="at">mfrow =</span> <span class="fu">c</span>(<span class="dv">2</span>, <span class="dv">2</span>), <span class="at">mar =</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>, <span class="dv">1</span>))</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">123</span>)</span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(network_list<span class="sc">$</span>summary_graph, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">4</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.color =</span> <span class="st">"red"</span>, <span class="at">main =</span> <span class="st">"Aggregate network"</span>)</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(network_list<span class="sc">$</span>marriage, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">4</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.color =</span> <span class="st">"gray"</span>, <span class="at">main =</span> <span class="st">"Marriage network"</span>)</span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(network_list<span class="sc">$</span>business, <span class="at">vertex.label =</span> <span class="cn">NA</span>, <span class="at">vertex.size =</span> <span class="dv">4</span>, <span class="at">edge.arrow.size =</span> <span class="fl">0.2</span>, </span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a>     <span class="at">vertex.color =</span> <span class="st">"green"</span>, <span class="at">main =</span> <span class="st">"Business network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img src="vignette_files/figure-html/unnamed-chunk-19-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="analysis-modules" class="level1">
+<h1>Analysis Modules</h1>
+<p>IDEANet also includes an analysis component. Individual analysis modules allow the researcher to take the output of the core <code>netwrite()</code> function and apply network-centric models, considerably expanding possibilities for interpretation. Currently, the Multiple Regression Quadratic Assignment Procedure (MRQAP) and Role-Analysis modules are available. We expect to expand the number of models as development on IDEANet move forward.</p>
+<section id="mrqap" class="level2">
+<h2 class="anchored" data-anchor-id="mrqap">MRQAP</h2>
+<p>MRQAP is an extension of the Mantel test which uses node-permutation in order to get around issues of non-independence that make a traditional regression analysis difficult when using network data. This module can be useful if the researcher has a question about the probability of a tie existing or the likelihood that tie will have a specific dyadic feature.</p>
+<p>For example, we may be interested in the following question about adolescent friendships in high-school: Is being of the same self-identified sex (e.g., sex homophily) increase the likelihood of a relationship? Are white students more likely to be friends with other white students (e.g., race homophily)?</p>
+<p>First, let’s reset our environment and return to the high-school data introduced earlier in the vignette:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a><span class="fu">rm</span>(<span class="at">list=</span><span class="fu">ls</span>()) <span class="co"># get a clean slate</span></span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a><span class="fu">data</span>(fauxmesa) </span>
+<span id="cb46-4"><a href="#cb46-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb46-5"><a href="#cb46-5" aria-hidden="true" tabindex="-1"></a><span class="fu">netwrite</span>(<span class="at">data_type =</span> <span class="st">"edgelist"</span>, </span>
+<span id="cb46-6"><a href="#cb46-6" aria-hidden="true" tabindex="-1"></a>         <span class="at">i_elements =</span> fauxmesa_edges<span class="sc">$</span>from, </span>
+<span id="cb46-7"><a href="#cb46-7" aria-hidden="true" tabindex="-1"></a>         <span class="at">j_elements =</span> fauxmesa_edges<span class="sc">$</span>to,</span>
+<span id="cb46-8"><a href="#cb46-8" aria-hidden="true" tabindex="-1"></a>         <span class="at">directed =</span> T,</span>
+<span id="cb46-9"><a href="#cb46-9" aria-hidden="true" tabindex="-1"></a>         <span class="at">nodelist =</span> fauxmesa_nodes,</span>
+<span id="cb46-10"><a href="#cb46-10" aria-hidden="true" tabindex="-1"></a>         <span class="at">node_id =</span> <span class="st">"id"</span>,</span>
+<span id="cb46-11"><a href="#cb46-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">net_name =</span> <span class="st">"fauxmesa_network"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Bonacich power centrality) Isolates detected in network. Isolates will be removed from network when calculating power centrality measure, and will be assigned NA values in final output.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Bonacich power centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Eigenvector centrality) Isolates detected in network. Isolates will be removed from network when calculating eigenvector centrality measure, and will be assigned NA values in final output.</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Eigenvector centrality) Adjacency matrix for network is singular. Network will be treated as undirected in order to calculate measures</code></pre>
+</div>
+<div class="cell-output cell-output-stderr">
+<pre><code>(Eigenvector centrality) Network consists of 2+ unconnected components. Eigenvector centrality scores will be calculated for nodes based on their position within their respective components.</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a>igraph<span class="sc">::</span><span class="fu">V</span>(fauxmesa_network)<span class="sc">$</span>race</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>NULL</code></pre>
+</div>
+</div>
+<p>We have information about student’s race and sex; however, MRQAP expects all information to be dyadic - in other words, we need to move from individual level information to <em>comparisons</em> between student’s in the relationships. For example, we may want to know if the sex of two students in a relationships is the same or not. For our second question, we only want to know if both students are white, not if they share the same race in general.</p>
+<p>To make this reformatting step more accessible, IDEANet offer the <code>qap_setup()</code> function. This function can work independently of <code>netwrite()</code> output, although we recommend its output as the input for all analysis modules.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb56"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb56-1"><a href="#cb56-1" aria-hidden="true" tabindex="-1"></a><span class="fu">qap_setup</span>(<span class="at">net =</span> fauxmesa_network, </span>
+<span id="cb56-2"><a href="#cb56-2" aria-hidden="true" tabindex="-1"></a>          <span class="at">variables =</span> <span class="fu">c</span>(<span class="st">"race"</span>, <span class="st">"sex"</span>),</span>
+<span id="cb56-3"><a href="#cb56-3" aria-hidden="true" tabindex="-1"></a>          <span class="at">methods =</span> <span class="fu">c</span>(<span class="st">"multi_category"</span>, <span class="st">"reduced_category"</span>), </span>
+<span id="cb56-4"><a href="#cb56-4" aria-hidden="true" tabindex="-1"></a>          <span class="at">directed =</span> T)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><code>qap_setup()</code> provides three possible methods for transforming data:</p>
+<ul>
+<li><p>“multi_category”: Applies to categorical variables only. It creates as many variables as there are unique values; each variable signals if both ego and alter have the given value.</p></li>
+<li><p>“reduced_category”: Applies to categorical variables only. Creates a single variable that signals if alter and ego have the <em>same</em> value.</p></li>
+<li><p>“both”: Applies to categorical variables only. Computes both the “multi_category” and “reduced_category” methods.</p></li>
+<li><p>“difference”: Applies to numeric variables only. Computes the difference in input value between ego and alter.</p></li>
+</ul>
+<p><code>qap_setup()</code> produces a list object <code>qap_results</code> that contains:</p>
+<ul>
+<li><p>An igraph object that includes the newly computed edge variables</p></li>
+<li><p>A nodelist</p></li>
+<li><p>An edgelist that includes the newly computed edge variables.</p></li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb57"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb57-1"><a href="#cb57-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(qap_results)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     Length Class      Mode
+[1,] 205    igraph     list
+[2,]  28    data.frame list
+[3,]   3    data.frame list</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb59"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb59-1"><a href="#cb59-1" aria-hidden="true" tabindex="-1"></a>qap_results[[<span class="dv">3</span>]] <span class="sc">%&gt;%</span> <span class="fu">select</span>(from, to, )</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    from  to
+1      0  24
+2      0  51
+3      0  57
+4      0  69
+5      0  86
+6      0  91
+7      0  95
+8      0  99
+9      0 109
+10     0 126
+11     0 150
+12     0 160
+13     0 173
+14     1  51
+15     1  99
+16     1 133
+17     1 189
+18     4 203
+19     7  29
+20     7 103
+21     7 159
+22     8  18
+23     8  53
+24     8 114
+25     8 204
+26    10  43
+27    10  73
+28    12  60
+29    12 152
+30    13 181
+31    14  21
+32    14  54
+33    14  75
+34    14 188
+35    15  39
+36    15 139
+37    16 121
+38    17  62
+39    17 128
+40    17 157
+41    17 194
+42    20  58
+43    20 101
+44    20 139
+45    21  54
+46    21  63
+47    21  75
+48    21 122
+49    21 188
+50    22  35
+51    24  42
+52    24  59
+53    24  76
+54    24  86
+55    24  91
+56    24 146
+57    26  67
+58    26  92
+59    28  50
+60    28  54
+61    29  53
+62    29 103
+63    29 159
+64    30 113
+65    30 184
+66    31 177
+67    32 139
+68    33 186
+69    33 199
+70    35  96
+71    35 166
+72    37 154
+73    42  59
+74    42  76
+75    43  73
+76    43 135
+77    46  73
+78    46  78
+79    46 101
+80    46 104
+81    46 138
+82    46 152
+83    46 188
+84    46 190
+85    46 200
+86    50  54
+87    50  60
+88    51 126
+89    51 189
+90    52  82
+91    52 135
+92    53 114
+93    54  60
+94    54  65
+95    54  85
+96    54 122
+97    54 156
+98    55  70
+99    55 128
+100   56 132
+101   57 148
+102   58  64
+103   58 103
+104   62 197
+105   63  65
+106   63 122
+107   63 138
+108   63 156
+109   64 103
+110   65  81
+111   65 156
+112   69 157
+113   69 194
+114   73 135
+115   73 175
+116   74 186
+117   74 203
+118   77 136
+119   78  98
+120   78 107
+121   78 163
+122   78 172
+123   80 130
+124   82 135
+125   86  87
+126   86  91
+127   86  95
+128   86 109
+129   86 126
+130   86 155
+131   86 178
+132   86 182
+133   87 182
+134   88 110
+135   88 130
+136   89 116
+137   90 186
+138   91 109
+139   95  99
+140   95 109
+141   95 136
+142   95 149
+143   95 178
+144   97 191
+145   98 163
+146   98 172
+147   99 136
+148   99 149
+149  100 107
+150  101 188
+151  101 200
+152  102 127
+153  102 140
+154  103 159
+155  104 138
+156  107 172
+157  108 120
+158  108 141
+159  109 133
+160  111 184
+161  113 137
+162  113 184
+163  114 143
+164  122 138
+165  122 156
+166  122 177
+167  122 188
+168  123 141
+169  123 159
+170  123 160
+171  124 203
+172  126 149
+173  126 150
+174  128 157
+175  131 149
+176  131 184
+177  133 195
+178  135 201
+179  136 178
+180  137 179
+181  137 184
+182  138 188
+183  138 192
+184  139 159
+185  139 193
+186  141 159
+187  145 191
+188  147 193
+189  148 164
+190  148 185
+191  152 169
+192  157 194
+193  159 165
+194  159 193
+195  160 189
+196  163 172
+197  164 177
+198  164 186
+199  164 198
+200  178 195
+201  180 181
+202  182 189
+203  188 190</code></pre>
+</div>
+</div>
+<p><code>qap_setup()</code> function returns four new variables. Variables appended with “_ego” and “_alter” represent the original values pulled from the nodelist. An additional variable is created for each of the two unique values that “house_gender” can take on: “both_house_gender_2” tells us if both ego and alter are households that are led by female respondents.</p>
+<p>With our variables of interest in hand, we can turn to the MRQAP analysis itself. The IDEANet MRQAP module provides the a <code>qap_run()</code> function which integrates seamlessly with the output from <code>netwrite()</code> and <code>qap_setup()</code>. Arguments for <code>qap_run()</code> toggles for the number of permutations and the family of the model (currently, linear and binomial). See function description for more information. If the <code>dependent</code> argument is left <code>NULL</code>, the function defaults to predicting the probability of tie.</p>
+<p><strong>NOTE:</strong> Binomial MRQAP is very sensitive to model specification; for exploratory purposes, it is recommended to stick to a linear functional form. We significantly decrease the number of permutations to allow for lower computation times, though this may make our confidence intervals less interpretable.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb61"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb61-1"><a href="#cb61-1" aria-hidden="true" tabindex="-1"></a><span class="co"># qap_run(net = qap_results[[1]], </span></span>
+<span id="cb61-2"><a href="#cb61-2" aria-hidden="true" tabindex="-1"></a><span class="co">#         variables = c("sex", "race"),</span></span>
+<span id="cb61-3"><a href="#cb61-3" aria-hidden="true" tabindex="-1"></a><span class="co">#         dependent = NULL, </span></span>
+<span id="cb61-4"><a href="#cb61-4" aria-hidden="true" tabindex="-1"></a><span class="co">#         directed = T,</span></span>
+<span id="cb61-5"><a href="#cb61-5" aria-hidden="true" tabindex="-1"></a><span class="co">#         reps = 500,</span></span>
+<span id="cb61-6"><a href="#cb61-6" aria-hidden="true" tabindex="-1"></a><span class="co">#         family = "linear")</span></span>
+<span id="cb61-7"><a href="#cb61-7" aria-hidden="true" tabindex="-1"></a><span class="co"># </span></span>
+<span id="cb61-8"><a href="#cb61-8" aria-hidden="true" tabindex="-1"></a><span class="co"># model_results[[1]]</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The MRAQP analysis outputs a list of two objects. The first contains a summary of model results akin to a traditional regression output. In this analysis, it is clear that shared household religion plays a major factor in the production of a socialization network, net of the difference in household degree and whether both households are female-led.</p>
+<p>The second network object provides the number of dyadic observations on which the model is computed.</p>
+</section>
+<section id="role-analysis" class="level2">
+<h2 class="anchored" data-anchor-id="role-analysis">Role Analysis</h2>
+<p><span class="citation" data-cites="Tom">@Tom</span> Wolff</p>
 
 
 </section>

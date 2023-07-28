@@ -268,14 +268,14 @@ With our variables of interest in hand, we can turn to the MRQAP analysis itself
 **NOTE:** Binomial MRQAP is very sensitive to model specification; for exploratory purposes, it is recommended to stick to a linear functional form. We significantly decrease the number of permutations to allow for lower computation times, though this may make our confidence intervals less interpretable.
 
 ```{r}
-qap_run(net = qap_results[[1]], 
-        variables = c("sex", "race"),
-        dependent = NULL, 
-        directed = T,
-        reps = 500,
-        family = "linear")
-
-model_results[[1]]
+# qap_run(net = qap_results[[1]], 
+#         variables = c("sex", "race"),
+#         dependent = NULL, 
+#         directed = T,
+#         reps = 500,
+#         family = "linear")
+# 
+# model_results[[1]]
 ```
 
 The MRAQP analysis outputs a list of two objects. The first contains a summary of model results akin to a traditional regression output. In this analysis, it is clear that shared household religion plays a major factor in the production of a socialization network, net of the difference in household degree and whether both households are female-led. 
