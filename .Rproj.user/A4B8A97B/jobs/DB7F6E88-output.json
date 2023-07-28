@@ -66,3 +66,5 @@
 [1,"\u001B[91mERROR: YAMLException: duplicated mapping key (_quarto.yml, 11:9)\n10: \u001B[34m        file: index.qmd\u001B[91m\n11: \u001B[34m        file: vignette.qmd\u001B[91m\n           ~~\n12: \u001B[34m        file: contact_us.qmd\u001B[91m\u001B[39m\n"]
 [1,"\u001B[32mGET: /vignette.html\u001B[39m\n"]
 [1,"\u001B[32mGET: /vignette.html\u001B[39m\n"]
+[1,"\u001B[32mGET: /vignette.html\u001B[39m\n"]
+[1,"\u001B[32mGET: /vignette.html\u001B[39m\n"]

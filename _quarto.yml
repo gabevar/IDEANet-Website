@@ -4,6 +4,7 @@ project:
 
 website:
   title: "IDEANet"
+  back-to-top-navigation: True
   navbar:
     pinned: True
     left:
