@@ -5,6 +5,7 @@ project:
 website:
   title: "IDEANet"
   navbar:
+    pinned: True
     left:
       - text: Home
         file: index.qmd
