@@ -8,10 +8,8 @@ website:
     left:
       - text: Home
         file: index.qmd
-      - text: R Vignette
-        file: vignette.qmd
-      - text: Contact Us
-        file: contact_us.qmd
+      - file: vignette.qmd
+      - file: contact_us.qmd
         
 format:
   html:

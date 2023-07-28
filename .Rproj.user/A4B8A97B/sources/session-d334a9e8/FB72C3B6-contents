@@ -1,5 +1,5 @@
 ---
-title: "IDEANet R Vignette"
+title: "R Vignette"
 ---
 
 The goal of the **IDEANet** program is to lower the barrier of entry to network analysis for scholars interested in relational measurement. Some researchers may have data and questions that are suitable to network analysis. And yet, getting comfortable with the tools available in R can prove to be an arduous and time consuming task.
