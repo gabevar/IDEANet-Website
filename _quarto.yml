@@ -6,13 +6,13 @@ website:
   title: "IDEANet"
   navbar:
     left:
-      - href: index.qmd
-        text: Home
-      - href: vignette.qmd
-        text: R Vignette
-      - href: contact_us.qmd
-        text: Contact Us
-
+      - text: Home
+        file: index.qmd
+      - text: R Vignette
+        file: vignette.qmd
+      - text: Contact Us
+        file: contact_us.qmd
+        
 format:
   html:
     theme: cosmo
