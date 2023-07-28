@@ -233,8 +233,6 @@ res_health <- health_system %>%
   filter(measure_labels %in% vars) %>% 
   select(measure_labels, measures) %>% mutate(network = "health")
 
-
-
 rbind(res_socialize, res_health) %>% arrange(measure_labels) %>% paged_table()
 ```
 

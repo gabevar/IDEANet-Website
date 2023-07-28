@@ -1,0 +1,1 @@
+{"frames":[],"message":"Error in netwrite(data_type = \"edgelist\", i_elements = fauxmesa_edges$from,  : \n  could not find function \"netwrite\"\n"}

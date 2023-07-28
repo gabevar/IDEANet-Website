@@ -1,0 +1,14 @@
+"0","data(fauxmesa) 
+"
+"2","Warning: data set ‘fauxmesa’ not found"
+"0",""
+"0","netwrite(data_type = ""edgelist"", "
+"0","         i_elements = fauxmesa_edges$from, "
+"0","         j_elements = fauxmesa_edges$to,"
+"0","         directed = T,"
+"0","         nodelist = fauxmesa_nodes,"
+"0","         node_id = ""id"","
+"0","         net_name = ""fauxmesa_network"")"
+"2","Error in netwrite(data_type = ""edgelist"", i_elements = fauxmesa_edges$from,  : 
+  could not find function ""netwrite""
+"

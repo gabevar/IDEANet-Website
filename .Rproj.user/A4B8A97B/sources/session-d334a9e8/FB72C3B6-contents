@@ -14,10 +14,11 @@ IDEANet is supported by the National Science Foundation as part of the Human Net
 
 Lets begin by importing IDEANet. IDEANet is currently available only as a Github package and requires a direct download using devtools.
 
-```{r}
+```{r, warning = F, message = F}
 library(devtools)
 install_github("https://github.com/Tom-Wolff/ideanet")
 library(ideanet)
+library(dplyr)
 ```
 
 In this vignette, we will be using the datasets included with the package. IDEANet comes with a variety of datasets we can explore using the `data()` function
@@ -47,7 +48,7 @@ Alternatively, the user can import their own data. IDEANet provides a useful mod
 
 ## Running netwrite()
 
-The central analysis component of IDEANet is accessed via the `netwrite()` function. `Netwrite()` comes with a breadth of arguments described in the `netwrite()` documentation. The documentation can be accessed with the following code, or by via our webpage (link).
+The central analysis component of IDEANet is accessed via the `netwrite()` function. `netwrite()` comes with a breadth of arguments described in the `netwrite()` documentation. The documentation can be accessed with the following code, or by via our webpage (link).
 
 ```{r}
 ?netwrite()
@@ -62,7 +63,7 @@ netwrite(data_type = "edgelist",
          directed = T)
 ```
 
-Netwrite() includes a series of warnings that warns you about the way certain measurements are calculated. In this case, while most metrics are calculated as directed (as we requested in the function), some functions such as power centrality and eigenvector centrality require interpreting the network as undirected.
+`netwrite()` includes a series of warnings that warns you about the way certain measurements are calculated. In this case, while most metrics are calculated as directed (as we requested in the function), some functions such as power centrality and eigenvector centrality require interpreting the network as undirected.
 
 While this successfully returned the metric we will be exploring further in this vignette, netwrite() has additional quality of life arguments that we can use with our example. For example, we want to include node level attributes and change the name of our output network.
 
@@ -72,7 +73,7 @@ However, notice that there are students in our nodelist that don't exist in our 
 setdiff(fauxmesa_nodes$id, fauxmesa_edges$from) %>% head()
 ```
 
-This is usually difficult for igraph to handle. In this case, netwrite() will consider additional student's as isolates in the network, and provide a warning that it is doing so.
+In this case, `netwrite()` will consider additional student's as isolates in the network.
 
 ```{r}
 rm(list=ls()) # get a clean slate
@@ -83,13 +84,14 @@ netwrite(data_type = "edgelist",
          i_elements = fauxmesa_edges$from, 
          j_elements = fauxmesa_edges$to,
          directed = T,
-         nodelist = fauxmesa_nodes$id,
+         nodelist = fauxmesa_nodes,
+         node_id = "id",
          net_name = "fauxmesa_network")
 ```
 
-## Netwrite() interpretation
+## netwrite() interpretation
 
-Netwrite() offers a variety of outputs that facilitate a clear interpretation of the network structure. Starting from the top, the output contains system level measures that tell the researcher about the network's overall characteristics.
+`netwrite()` offers a variety of outputs that facilitate a clear interpretation of the network structure. Starting from the top, the output contains system level measures that tell the researcher about the network's overall characteristics.
 
 ```{r}
 system_measure_plot
@@ -103,15 +105,15 @@ These measurements are also available in traditional table form.
 system_level_measures %>% rmarkdown::paged_table()
 ```
 
-Netwrite() also outputs a graph object that contains each node and edge-level measurement computed within the function. This graph object allows for traditional network manipulation, such as plotting.
+`netwrite()` also outputs a graph object that contains each node and edge-level measurement computed within the function. This graph object allows for traditional network manipulation, such as plotting.
 
 ```{r}
 plot(fauxmesa_network, vertex.label = NA, vertex.size = 3, edge.arrow.size = 0.2)
 ```
 
-Note that the output network can contain both isolates and self-loops. Isolates were included when we defined a list of node ids (including isolate) in the "nodelist" argument of netwrite(). There is currently no method for removing self-loops within netwrite() - instead, the user is expected to remove any unwanted edges before reading them into netwrite().
+Note that the output network can contain both isolates and self-loops. Isolates were included when we defined a list of node ids (including isolate) in the "nodelist" argument of `netwrite()`. There is currently no method for removing self-loops within `netwrite()` - instead, the user is expected to remove any unwanted edges before reading them into `netwrite()`.
 
-In addition to the full network, researchers may be interested in the shape of major sub-components. Netwrite outputs two additional graph objects: the largest component in the network.
+In addition to the full network, researchers may be interested in the shape of major sub-components. `netwrite()` outputs two additional graph objects: the largest component in the network.
 
 ```{r}
 plot(largest_component, vertex.label = NA, vertex.size = 3, edge.arrow.size = 0.2, 
@@ -125,15 +127,161 @@ plot(largest_bi_component, vertex.label = NA, vertex.size = 3, edge.arrow.size =
      main = "largest bi-component")
 ```
 
-Netwrite() also outputs an edgelist dataframe of the same length as the input edges. This edgelist object contains unique dyad-level ids, internal ego and alter ids, the original id values and weights (uniformly set to 1 if no weights are defined).
+`netwrite()` also outputs an edgelist dataframe of the same length as the input edges. This edgelist object contains unique dyad-level ids, internal ego and alter ids, the original id values and weights (uniformly set to 1 if no weights are defined).
 
 ```{r}
 head(edgelist) %>% rmarkdown::paged_table()
 ```
 
-Lastly, netwrite() returns measurement at the node level as a dataframe of values and a plot of distributions. Certain measurements are computed only under certain weight and edge direction conditions - that is, the nodelist only contains measurements appropriate to the network features.
+Lastly, `netwrite()` returns measurement at the node level as a dataframe of values and a plot of distributions. Certain measurements are computed only under certain weight and edge direction conditions - that is, the nodelist only contains measurements appropriate to the network features.
 
 ```{r}
 head(node_measures) %>% rmarkdown::paged_table()
 node_measure_plot
 ```
+
+## Multilayered networks
+
+IDEANet can also handle multilayered networks. For example, we may be interested in both marriage and business between elite Florentine families that gave rise to the prominence of the house of Medici. This data is available in the IDEANet package and contains a `layer` column that indicates if the relationships are marriage ties or business ties.
+
+```{r}
+rm(list=ls()) # get a clean slate
+
+data(florentine) # bring in our florentine families data
+
+florentine <- florentine %>% 
+  mutate(layer = case_when(layer == 1 ~ "marriage", T ~ "business"))
+
+head(florentine, 10)
+```
+
+Taking advantage of these layers in `netwrite()` is easy: just indicate which column contains your layer information using the `type` argument.
+
+```{r}
+netwrite(data_type = "edgelist", 
+         i_elements = florentine$node, 
+         j_elements = florentine$target,
+         directed = F,
+         type = florentine$layer, # indicate layer variable
+         net_name = "florentine_network")
+```
+
+Running `netwrite()` on multi-layered network will yield some additional warnings that `netwrite()` is being computed on each layer separately, and on a network containing aggregated layers.
+
+When given a multi-layered network to work with, `netwrite()` will return the outputs described previously in slightly different ways. First, we can see that the `edgelist` object contains every type of tie, and comes paired with a list object `edgelists_list` that separates each type of connection into their own edgelist.
+
+```{r}
+head(edgelist) %>% rmarkdown::paged_table()
+summary(edgelist_list)
+```
+
+The same is true of the `node_measures` object and its associated list object `node_measures_list`. For node measurements, variables with no tie-type prefix are calculated using every type of tie, while measurements calculated on a specific sub-network have the associated tie-type prefix. For example, in this example we see 3 different values for total degree, one for marriage ties, one for business ties and a value without prefix that represents the metric for the aggregate network.
+
+```{r}
+node_measures %>% 
+  dplyr::select(id, total_degree, marriage_total_degree, business_total_degree) %>%
+  rmarkdown::paged_table()
+```
+
+Every other expected output are constructed as list objects and have the "\_list" suffix. Lists can be accessed to access metric at different layers of the network, or the network with aggregated layers. For example, we can access the "network_list" object and extract the three layer-associated graphs.
+
+```{r}
+summary(network_list) # Check in which position each sub-network is
+
+par(mfrow = c(2, 2), mar = c(1, 1, 1, 1))
+set.seed(123)
+plot(network_list$summary_graph, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "red", main = "Aggregate network")
+plot(network_list$marriage, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "gray", main = "Marriage network")
+plot(network_list$business, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, 
+     vertex.color = "green", main = "Business network")
+```
+
+# Analysis Modules
+
+IDEANet also includes an analysis component. Individual analysis modules allow the researcher to take the output of the core `netwrite()` function and apply network-centric models, considerably expanding possibilities for interpretation. Currently, the Multiple Regression Quadratic Assignment Procedure (MRQAP) and Role-Analysis modules are available. We expect to expand the number of models as development on IDEANet move forward.
+
+## MRQAP
+
+MRQAP is an extension of the Mantel test which uses node-permutation in order to get around issues of non-independence that make a traditional regression analysis difficult when using network data. This module can be useful if the researcher has a question about the probability of a tie existing or the likelihood that tie will have a specific dyadic feature.
+
+For example, we may be interested in the following question about adolescent friendships in high-school: Is being of the same self-identified sex (e.g., sex homophily) increase the likelihood of a relationship? Are white students more likely to be friends with other white students (e.g., race homophily)?
+
+First, let's reset our environment and return to the high-school data introduced earlier in the vignette:
+
+```{r}
+rm(list=ls()) # get a clean slate
+
+data(fauxmesa) 
+
+netwrite(data_type = "edgelist", 
+         i_elements = fauxmesa_edges$from, 
+         j_elements = fauxmesa_edges$to,
+         directed = T,
+         nodelist = fauxmesa_nodes,
+         node_id = "id",
+         net_name = "fauxmesa_network")
+
+igraph::V(fauxmesa_network)$race
+```
+
+We have information about student's race and sex; however, MRQAP expects all information to be dyadic - in other words, we need to move from individual level information to *comparisons* between student's in the relationships. For example, we may want to know if the sex of two students in a relationships is the same or not. For our second question, we only want to know if both students are white, not if they share the same race in general.
+
+To make this reformatting step more accessible, IDEANet offer the `qap_setup()` function. This function can work independently of `netwrite()` output, although we recommend its output as the input for all analysis modules.
+
+```{r}
+qap_setup(net = fauxmesa_network, 
+          variables = c("race", "sex"),
+          methods = c("multi_category", "reduced_category"), 
+          directed = T)
+```
+
+`qap_setup()` provides three possible methods for transforming data:
+
+-   "multi_category": Applies to categorical variables only. It creates as many variables as there are unique values; each variable signals if both ego and alter have the given value.
+
+-   "reduced_category": Applies to categorical variables only. Creates a single variable that signals if alter and ego have the *same* value.
+
+-   "both": Applies to categorical variables only. Computes both the "multi_category" and "reduced_category" methods.
+
+-   "difference": Applies to numeric variables only. Computes the difference in input value between ego and alter.
+
+`qap_setup()` produces a list object `qap_results` that contains:
+
+-   An igraph object that includes the newly computed edge variables
+
+-   A nodelist
+
+-   An edgelist that includes the newly computed edge variables.
+
+```{r}
+summary(qap_results)
+
+qap_results[[3]] %>% select(from, to, )
+```
+
+`qap_setup()` function returns four new variables. Variables appended with "\_ego" and "\_alter" represent the original values pulled from the nodelist. An additional variable is created for each of the two unique values that "house_gender" can take on: "both_house_gender_2" tells us if both ego and alter are households that are led by female respondents.
+
+With our variables of interest in hand, we can turn to the MRQAP analysis itself. The IDEANet MRQAP module provides the a `qap_run()` function which integrates seamlessly with the output from `netwrite()` and `qap_setup()`. Arguments for `qap_run()` toggles for the number of permutations and the family of the model (currently, linear and binomial). See function description for more information. If the `dependent` argument is left `NULL`, the function defaults to predicting the probability of tie.
+
+**NOTE:** Binomial MRQAP is very sensitive to model specification; for exploratory purposes, it is recommended to stick to a linear functional form. We significantly decrease the number of permutations to allow for lower computation times, though this may make our confidence intervals less interpretable.
+
+```{r}
+qap_run(net = qap_results[[1]], 
+        variables = c("sex", "race"),
+        dependent = NULL, 
+        directed = T,
+        reps = 500,
+        family = "linear")
+
+model_results[[1]]
+```
+
+The MRAQP analysis outputs a list of two objects. The first contains a summary of model results akin to a traditional regression output. In this analysis, it is clear that shared household religion plays a major factor in the production of a socialization network, net of the difference in household degree and whether both households are female-led. 
+
+The second network object provides the number of dyadic observations on which the model is computed.
+
+## Role Analysis
+
+@Tom Wolff

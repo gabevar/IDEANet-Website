@@ -1,0 +1,4 @@
+"0","qap_setup(net = fauxmesa_network, "
+"0","          variables = c(""race"", ""sex""),"
+"0","          methods = c(""multi_category"", ""reduced_category""), "
+"0","          directed = T)"

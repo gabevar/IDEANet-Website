@@ -1,0 +1,2 @@
+"0","plot(largest_bi_component, vertex.label = NA, vertex.size = 3, edge.arrow.size = 0.2, "
+"0","     main = ""largest bi-component"")"

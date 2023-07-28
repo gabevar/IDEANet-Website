@@ -1,0 +1,2 @@
+"0","plot(network_list$marriage, vertex.label = NA, vertex.size = 4, edge.arrow.size = 0.2, "
+"0","     vertex.color = ""gray"", main = ""Marriage network"")"
