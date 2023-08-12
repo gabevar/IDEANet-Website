@@ -9,7 +9,7 @@ website:
     pinned: True
     left:
       - text: Home
-        file: index.qmd
+      - file: index.qmd
       - file: vignette.qmd
       - file: data_storage.qmd
       - file: contact_us.qmd
