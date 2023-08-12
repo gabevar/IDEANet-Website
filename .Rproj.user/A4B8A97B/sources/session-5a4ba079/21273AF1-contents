@@ -1,0 +1,29 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+library(devtools)
+install_github("https://github.com/Tom-Wolff/ideanet/tree/main_dev")
+library(ideanet)
+```
+
+```{r}
+data(fauxmesa) 
+
+netwrite(data_type = "edgelist", 
+         i_elements = fauxmesa_edges$from, 
+         j_elements = fauxmesa_edges$to,
+         directed = T,
+         nodelist = fauxmesa_nodes,
+         node_id = "id",
+         net_name = "fauxmesa_network")
+
+igraph::V(fauxmesa_network)$race
+
+t <- c(unique(fauxmesa_edges$from), unique(fauxmesa_edges$to))
+
+setdiff(t, fauxmesa_nodes$id)
+setdiff(fauxmesa_nodes$id, t)
+```

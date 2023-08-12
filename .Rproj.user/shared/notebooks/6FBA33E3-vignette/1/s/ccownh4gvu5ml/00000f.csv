@@ -1,0 +1,5 @@
+"0","library(devtools)"
+"0","install_github(""Tom-Wolff/ideanet"", ref = ""main_dev"")"
+"2","Error: Failed to install 'ideanet' from GitHub:
+  Could not resolve host: api.github.com
+"

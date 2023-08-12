@@ -1,0 +1,8 @@
+"0","rm(list=ls()) # get a clean slate"
+"0",""
+"0","data(florentine) # bring in our florentine families data"
+"0",""
+"0","florentine <- florentine %>% "
+"0","  mutate(layer = case_when(layer == 1 ~ ""marriage"", T ~ ""business""))"
+"0",""
+"0","head(florentine, 10)"
