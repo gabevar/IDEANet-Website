@@ -40,7 +40,21 @@ IDEANet allows the researcher to directly input their data and retrieve high-qua
 
 # Reading in Files: Netread()
 
-Alternatively, the user can import their own data. IDEANet provides a useful module that ingests a variety of data formats and converts them to a shape expected by further IDEANet modules...
+Alternatively, the user can import their own data. IDEANet provides a useful module that ingests a variety of data formats and converts them to a shape expected by further IDEANet modules. This module can accept `csv`, `excel` (.xls, .xlsx), `igraph`, `network` or `sna` (for network objects), `pajek` and `ucinet` files.
+
+For `excel` and `csv` files, more information about the number of sheets and the use of variable names in the first row can be included. In this example, we import a `csv` file that contains an edgelist and its accompanying nodelist.
+
+```{r}
+rm(list=ls())
+
+netread(path = "/Users/gabe/Documents/Projects/IDEAnet/data/edges_ideanet_test.csv",
+        filetype = "csv",
+        format = "edgelist",
+        net_name = "testnetwork",
+        nodelist = "/Users/gabe/Documents/Projects/IDEAnet/data/nodes_ideanet_test.csv")
+```
+
+The result are two objects, an `edgelist` and `nodelist`, that can be used directly in the central `netwrite()` function. More information can be found in the documentation using `?netread()`
 
 # Core Analysis: Netwrite()
 
@@ -55,6 +69,10 @@ The central analysis component of IDEANet is accessed via the `netwrite()` funct
 Returning to our high-school example, we can ask IDEANet to return basic network measurements on the network by including some basic arguments: what kind of network object we are using -- in this case, an edgelist -- and some information about sources, targets and their directionality.
 
 ```{r}
+rm(list=ls())
+
+data(fauxmesa)
+
 netwrite(data_type = "edgelist", 
          i_elements = fauxmesa_edges$from, 
          j_elements = fauxmesa_edges$to,

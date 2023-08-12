@@ -2,4 +2,6 @@
 title: "Contact Us"
 ---
 
-Contact information:
+We are continually improving our tool and adding features. If you run into any issues, please add an issue directly on our [Github page](https://github.com/Tom-Wolff/ideanet/issues). If you would like to collaborate on development, propose a pull request directly on our [Github page](https://github.com/Tom-Wolff/ideanet/pulls) as well.
+
+You can contact the IDEANet team directly at gv42\@duke.edu.

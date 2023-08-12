@@ -1,0 +1,7 @@
+"0","rm(list=ls()) # get a clean slate"
+"0",""
+"0","netread(path = ""/Users/gabe/Documents/Projects/IDEAnet/data/edges_ideanet_test.csv"","
+"0","        filetype = ""csv"","
+"0","        format = ""edgelist"","
+"0","        net_name = ""testnetwork"","
+"0","        nodelist = ""/Users/gabe/Documents/Projects/IDEAnet/data/nodes_ideanet_test.csv"")"

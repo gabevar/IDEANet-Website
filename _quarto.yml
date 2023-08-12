@@ -11,6 +11,7 @@ website:
       - text: Home
         file: index.qmd
       - file: vignette.qmd
+      - file: data_storage.qmd
       - file: contact_us.qmd
         
 format:
