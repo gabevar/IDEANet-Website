@@ -6,7 +6,7 @@ website:
   title: "IDEANet"
   back-to-top-navigation: True
   navbar:
-    pinned: True
+    pinned: False
     left:
       - href: index.qmd
       - href: vignette.qmd
