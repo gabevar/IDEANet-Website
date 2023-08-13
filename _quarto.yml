@@ -8,10 +8,10 @@ website:
   navbar:
     pinned: True
     left:
-      - file: index.qmd
-      - file: vignette.qmd
-      - file: data_storage.qmd
-      - file: contact_us.qmd
+      - href: index.qmd
+      - href: vignette.qmd
+      - href: data_storage.qmd
+      - href: contact_us.qmd
         
 format:
   html:

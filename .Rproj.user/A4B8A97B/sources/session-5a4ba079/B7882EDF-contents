@@ -1,6 +1,8 @@
 ---
-title: "Introducing IDEANet - Integrating Data Exchange and Analysis for Networks"
+title: "Home"
 ---
+
+# Introducing IDEANet - Integrating Data Exchange and Analysis for Networks
 
 Over the last 40 years, network analysis has emerged as a prominent approach to data-intensive research. Despite this steady growth and investment, network analysis remains something of a niche specialty that can exclude novice users who usually only receive standard statistical training. Moreover, since much of the growth in network science has tended to be field-specific, tools and formats have developed independently across disciplines. The multiplicity of formats and sensitivity of social data makes existing records difficult to share across scholars in the field, limiting the opportunity for new findings on the already accumulated body of network data. **IDEANet - Integrating Data Exchange and Analysis for Networks - aims to maximize scientific discovery in human network science by significantly lowering the analytic and access barriers-to-entry for researchers.** IDEANet is supported by the National Science Foundation as part of the Human Networks and Data Science - Infrastructure program (BCS-2024271 and BCS-2140024).
 
